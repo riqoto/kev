@@ -2,12 +2,11 @@ package main
 
 import "strings"
 
-func Get(store map[string]string, key string) string {
-	if store[key] != "" {
-		return store[key]
-	}
+func Get(store map[string]string, key string) (string, bool){
+	value, ok := store[key]
 
-	return ""
+	return value,ok
+
 }
 
 func Set(store map[string]string, key, value string) {

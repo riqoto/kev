@@ -1,33 +1,27 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
 	store := make(map[string]string)
-	Set(store, "name", "ahmet")
-	name := Get(store, "name")
-	fmt.Println(name)
-	del := Delete(store, "name")
-	fmt.Println("Deleted", del)
+	scanner := bufio.NewScanner(os.Stdin)
 
-	empty := Get(store, "name")
-	fmt.Println(empty)
+	for {
+		fmt.Print("> ")
+		scanner.Scan()
+		line := scanner.Text()
 
-	var i, j, k string
+		if line == "exit" {
+			break
+		}
 
-	fmt.Print(">")
-	fmt.Scanf("%s %s %s", &i, &j, &k)
-	fmt.Println(i, j, k)
-
-	com := ParseCommand(fmt.Sprintf("%s %s %s", i, j, k))
-
-	fmt.Println(com.Operand, com.Key, com.Value)
-
-	com.Execute(store)
-	age := Get(store, "age")
-	fmt.Println(age)
+		com := ParseCommand(line)
+		com.Execute(store)
+	}
 }
+
 
