@@ -17,7 +17,7 @@ func Set(store map[string]string, key, value string) {
 }
 
 func Delete(store map[string]string, key string) string {
-	if store[key] != "" {
+	if _,ok := store[key]; ok {
 		deleted := store[key]
 		delete(store, key)
 		return deleted
