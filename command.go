@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"strings"
 )
 
@@ -39,11 +39,11 @@ func (c *Command) Execute(store map[string]string) {
 	case "set":
 		Set(store, c.Key, c.Value)
 	case "get":
-		log.Println(Get(store, c.Key))
+		fmt.Println(Get(store, c.Key))
 	case "delete":
 		Delete(store, c.Key)
 	default:
-		log.Panic("Invalid Operand")
+		fmt.Println("Invalid Operand")
 	}
 }
 

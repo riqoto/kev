@@ -14,14 +14,17 @@ func Set(store map[string]string, key, value string) {
 	value = strings.TrimSpace(value)
 
 	store[key] = value
+	Save(store)
 }
 
 func Delete(store map[string]string, key string) string {
 	if _,ok := store[key]; ok {
 		deleted := store[key]
 		delete(store, key)
+		Save(store)
 		return deleted
 	}
+
 
 	return "key not found"
 }
