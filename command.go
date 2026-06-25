@@ -34,14 +34,14 @@ func ParseCommand(command string) Command {
 	return com
 }
 
-func (c *Command) Execute(store map[string]string) {
+func (c *Command) Execute(store Store) {
 	switch c.Operand {
 	case "set":
-		Set(store, c.Key, c.Value)
+		store.Set(c.Key, c.Value)
 	case "get":
-		fmt.Println(Get(store, c.Key))
+		fmt.Println(store.Get(c.Key))
 	case "delete":
-		Delete(store, c.Key)
+		store.Delete(c.Key)
 	default:
 		fmt.Println("Invalid Operand")
 	}

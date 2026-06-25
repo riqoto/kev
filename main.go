@@ -7,9 +7,10 @@ import (
 )
 
 func main() {
-	store := make(map[string]string)
-	scanner := bufio.NewScanner(os.Stdin)
 
+	store := NewStore()
+	scanner := bufio.NewScanner(os.Stdin)
+	go StartServer(store)	
 	for {
 		fmt.Print("> ")
 		scanner.Scan()

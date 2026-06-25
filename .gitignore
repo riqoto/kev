@@ -1,2 +1,7 @@
+# data.csv dosyasını ignore et
 data.csv
+
+# deprecated klasörünü ignore et
+deprecated/
+
 
