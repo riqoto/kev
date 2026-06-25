@@ -27,12 +27,26 @@ func NewEntry() Entry {
 	entry := Entry{
 		Key:   "",
 		Value: "",
-		TTL:   time.Now().Add(time.Second * 3600),
+		TTL:   time.Now().Add(time.Second * 60),
 	}
 
 	return entry
 }
+func (store *Store) CleanExpiry() {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	go func() {
+		for {
+			time.Sleep(time.Second)
 
+			for key,entry := range store.Data {
+				if time.Now().After(entry.TTL) {
+					store.Delete(key)
+				}
+			}
+		}
+	}()
+}
 func (store *Store) Get(key string) (string, bool) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()

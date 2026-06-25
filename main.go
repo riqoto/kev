@@ -9,6 +9,7 @@ import (
 func main() {
 
 	store := NewStore()
+	go store.CleanExpiry()
 	scanner := bufio.NewScanner(os.Stdin)
 	go StartServer(store)	
 	for {
