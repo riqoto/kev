@@ -38,12 +38,13 @@ func (store *Store) CleanExpiry() {
 	go func() {
 		for {
 			time.Sleep(time.Second)
-
+			store.mu.Lock()
 			for key,entry := range store.Data {
 				if time.Now().After(entry.TTL) {
-					store.Delete(key)
+					delete(store.Data, key)
 				}
 			}
+			store.mu.Unlock()
 		}
 	}()
 }
