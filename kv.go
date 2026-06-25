@@ -60,7 +60,7 @@ func (store *Store) Set(key, value string) {
 
 }
 
-func (store Store) Delete(key string) string {
+func (store *Store) Delete(key string) string {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	if _, ok := store.Data[key]; ok {
