@@ -37,6 +37,7 @@ func ParseCommand(command string) Command {
 }
 
 func (c *Command) Execute(store *Store, w io.Writer) {
+		
 	switch c.Operand {
 	case "set":
 		store.Set(c.Key, c.Value)
