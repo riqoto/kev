@@ -1,7 +1,7 @@
 package main
 
 import (
-	"strings"
+	"kev/list"
 	"sync"
 	"time"
 )
@@ -13,13 +13,17 @@ type Entry struct {
 }
 
 type Store struct {
-	mu   sync.RWMutex
-	Data map[string]Entry
+	mu       sync.RWMutex
+	Data     map[string]*list.Element[Entry]
+	lru      *list.List[Entry]
+	capacity int
 }
 
-func NewStore() *Store {
+func NewStore(capacity int) *Store {
 	return &Store{
-		Data: make(map[string]Entry),
+		Data:     make(map[string]*list.Element[Entry]),
+		lru:      list.New[Entry](),
+		capacity: capacity,
 	}
 }
 
@@ -37,8 +41,8 @@ func (store *Store) CleanExpiry() {
 		for {
 			time.Sleep(time.Second)
 			store.mu.Lock()
-			for key,entry := range store.Data {
-				if time.Now().After(entry.TTL) {
+			for key, entry := range store.Data {
+				if time.Now().After(entry.Value.TTL) {
 					delete(store.Data, key)
 				}
 			}
@@ -47,41 +51,48 @@ func (store *Store) CleanExpiry() {
 	}()
 }
 func (store *Store) Get(key string) (string, bool) {
-	store.mu.RLock()
-	defer store.mu.RUnlock()
-	entry, ok := store.Data[key]
-
-	value := entry.Value
-
-	return value, ok
-
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	element, ok := store.Data[key]
+	if !ok {
+		return "", false
+	}
+	store.lru.MoveToFront(element)
+	return element.Value.Value, true
 }
 
 func (store *Store) Set(key, value string) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	entry := NewEntry()
+	if element, ok := store.Data[key]; ok {
+		element.Value.Value = value
+		store.lru.MoveToFront(element)
+		return
+	}
 
-	key = strings.TrimSpace(key)
-	value = strings.TrimSpace(value)
+	if len(store.Data) >= store.capacity {
+		back := store.lru.Back()
+		if back != nil {
+			delete(store.Data, back.Value.Key)
+			store.lru.Remove(back)
+		}
+	}
 
-	entry.Key = key
-	entry.Value = value
-
-	store.Data[key] = entry
-
+	entry := Entry{Key: key, Value: value, TTL: time.Now().Add(time.Second * 60)}
+	element := store.lru.PushFront(entry)
+	store.Data[key] = element
 }
-
 func (store *Store) Delete(key string) string {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	if _, ok := store.Data[key]; ok {
-		deleted := store.Data[key].Value
+		deleted := store.Data[key].Value.Value
 		delete(store.Data, key)
 
 		return deleted
 	}
 	return "key not found"
 }
+
 
