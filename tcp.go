@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 // create TCPConfig or use default if exist for port and conn type
-func StartServer(store Store) {
+func StartServer(store *Store) {
 	listener, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
@@ -26,7 +26,7 @@ func StartServer(store Store) {
 	}
 }
 
-func handleConnection(conn net.Conn, store Store) {
+func handleConnection(conn net.Conn, store *Store) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)

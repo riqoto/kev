@@ -2,78 +2,73 @@ package main
 
 import (
 	"strings"
+	"sync"
 	"time"
 )
 
-var ttl uint64 = 3600 
-
 type Entry struct {
-	Key string
+	Key   string
 	Value string
-	TTL int // second
-	ExpireAt time.Time  
+	TTL   time.Time
 }
 
 type Store struct {
+	mu   sync.RWMutex
 	Data map[string]Entry
-	Path string
 }
 
-func NewStore() Store {
-	store := Store {
-		Data : make(map[string]Entry),
-		Path: "",
+func NewStore() *Store {
+	return &Store{
+		Data: make(map[string]Entry),
 	}
-
-	return store
 }
-
 
 func NewEntry() Entry {
-	entry := Entry {
-		Key: "",
+	entry := Entry{
+		Key:   "",
 		Value: "",
-		TTL: 3600,
-		ExpireAt: time.Now().Add(time.Second *  3600),
+		TTL:   time.Now().Add(time.Second * 3600),
 	}
-	
+
 	return entry
 }
 
-
-func (store Store)Get(key string) (string, bool){
-
+func (store *Store) Get(key string) (string, bool) {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
 	entry, ok := store.Data[key]
 
 	value := entry.Value
 
-	return value,ok
+	return value, ok
 
 }
 
-func (store Store)Set(key, value string) {
+func (store *Store) Set(key, value string) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
 	entry := NewEntry()
-	
+
 	key = strings.TrimSpace(key)
 	value = strings.TrimSpace(value)
-	
+
 	entry.Key = key
 	entry.Value = value
-	
+
 	store.Data[key] = entry
-//	Save(store)
+
 }
 
-func (store Store)Delete(key string) string {
-
-	if _,ok := store.Data[key]; ok {
+func (store Store) Delete(key string) string {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	if _, ok := store.Data[key]; ok {
 		deleted := store.Data[key].Value
 		delete(store.Data, key)
-//		Save(store)
+
 		return deleted
 	}
-
-
 	return "key not found"
 }
 

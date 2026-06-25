@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -34,12 +35,18 @@ func ParseCommand(command string) Command {
 	return com
 }
 
-func (c *Command) Execute(store Store) {
+func (c *Command) Execute(store *Store) {
 	switch c.Operand {
 	case "set":
 		store.Set(c.Key, c.Value)
 	case "get":
-		fmt.Println(store.Get(c.Key))
+		value, ok := store.Get(c.Key)
+		if ok {
+			fmt.Fprintln(os.Stdout, value)
+		} else {
+			fmt.Fprintln(os.Stdout, "nil")
+		}
+
 	case "delete":
 		store.Delete(c.Key)
 	default:
