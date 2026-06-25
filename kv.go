@@ -33,8 +33,6 @@ func NewEntry() Entry {
 	return entry
 }
 func (store *Store) CleanExpiry() {
-	store.mu.Lock()
-	defer store.mu.Unlock()
 	go func() {
 		for {
 			time.Sleep(time.Second)
