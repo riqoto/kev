@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
+//	"os"
 	"strings"
+	"io"
 )
 
 type Command struct {
@@ -35,22 +36,26 @@ func ParseCommand(command string) Command {
 	return com
 }
 
-func (c *Command) Execute(store *Store) {
+func (c *Command) Execute(store *Store, w io.Writer) {
 	switch c.Operand {
 	case "set":
 		store.Set(c.Key, c.Value)
+		fmt.Fprintln(w, "ok")
 	case "get":
 		value, ok := store.Get(c.Key)
 		if ok {
-			fmt.Fprintln(os.Stdout, value)
+			fmt.Fprintln(w, value)
 		} else {
-			fmt.Fprintln(os.Stdout, "nil")
+			fmt.Fprintln(w, "nil")
 		}
 
 	case "delete":
 		store.Delete(c.Key)
+		fmt.Fprintln(w,"ok")
 	default:
-		fmt.Println("Invalid Operand")
+		fmt.Fprintln(w,"Invalid Operand")
+
+
 	}
 }
 

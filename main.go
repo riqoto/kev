@@ -21,7 +21,7 @@ func main() {
 		}
 
 		com := ParseCommand(line)
-		com.Execute(store)
+		com.Execute(store, os.Stdout)
 	}
 }
 

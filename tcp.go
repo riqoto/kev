@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"os"
 )
 
 // create TCPConfig or use default if exist for port and conn type
@@ -31,7 +32,7 @@ func handleConnection(conn net.Conn, store *Store) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
-
+	
 	for {
 		message, err := reader.ReadString('\n')
 
@@ -41,7 +42,7 @@ func handleConnection(conn net.Conn, store *Store) {
 		}
 
 		command := ParseCommand(strings.ToLower(strings.TrimSpace(message)))
-		command.Execute(store)
+		command.Execute(store, os.Stdout)
 	}
 }
 
