@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"os"
+//	"os"
 )
+
 
 // create TCPConfig or use default if exist for port and conn type
 func StartServer(store *Store) {
@@ -42,7 +43,7 @@ func handleConnection(conn net.Conn, store *Store) {
 		}
 
 		command := ParseCommand(strings.ToLower(strings.TrimSpace(message)))
-		command.Execute(store, os.Stdout)
+		command.Execute(store, conn)
 	}
 }
 
