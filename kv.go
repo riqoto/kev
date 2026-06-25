@@ -27,23 +27,16 @@ func NewStore(capacity int) *Store {
 	}
 }
 
-func NewEntry() Entry {
-	entry := Entry{
-		Key:   "",
-		Value: "",
-		TTL:   time.Now().Add(time.Second * 60),
-	}
 
-	return entry
-}
 func (store *Store) CleanExpiry() {
 	go func() {
 		for {
 			time.Sleep(time.Second)
 			store.mu.Lock()
-			for key, entry := range store.Data {
-				if time.Now().After(entry.Value.TTL) {
+			for key, element := range store.Data {
+				if time.Now().After(element.Value.TTL) {
 					delete(store.Data, key)
+					store.lru.Remove(element)
 				}
 			}
 			store.mu.Unlock()
@@ -86,9 +79,10 @@ func (store *Store) Set(key, value string) {
 func (store *Store) Delete(key string) string {
 	store.mu.Lock()
 	defer store.mu.Unlock()
-	if _, ok := store.Data[key]; ok {
-		deleted := store.Data[key].Value.Value
+	if element , ok := store.Data[key]; ok {
+		deleted := element.Value.Value
 		delete(store.Data, key)
+		store.lru.Remove(element)
 
 		return deleted
 	}
