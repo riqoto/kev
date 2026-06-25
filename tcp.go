@@ -32,17 +32,17 @@ func handleConnection(conn net.Conn, store *Store) {
 
 	reader := bufio.NewReader(conn)
 
-	message, err := reader.ReadString('\n')
+	for {
+		message, err := reader.ReadString('\n')
 
-	if err != nil {
-		fmt.Println("failed to read: ", err)
-		return
+		if err != nil {
+			fmt.Println("failed to read: ", err)
+			return
+		}
+
+		command := ParseCommand(strings.ToLower(strings.TrimSpace(message)))
+		command.Execute(store)
 	}
-
-	query := strings.ToLower(strings.TrimSpace(message))
-	command := ParseCommand(query)
-
-	command.Execute(store)
 }
 
 
