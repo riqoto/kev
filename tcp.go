@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 )
+
 // create TCPConfig or use default if exist for port and conn type
 func StartServer(store *Store) {
 	listener, err := net.Listen("tcp", ":8080")
@@ -21,7 +22,7 @@ func StartServer(store *Store) {
 		if err != nil {
 			fmt.Println("failed to accept: ", err)
 		}
-		
+
 		go handleConnection(conn, store)
 	}
 }
@@ -40,7 +41,8 @@ func handleConnection(conn net.Conn, store *Store) {
 
 	query := strings.ToLower(strings.TrimSpace(message))
 	command := ParseCommand(query)
-	
+
 	command.Execute(store)
 }
+
 
