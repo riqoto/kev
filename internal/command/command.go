@@ -1,10 +1,10 @@
-package main
+package command
 
 import (
 	"fmt"
-//	"os"
-	"strings"
 	"io"
+	"kev/internal/store"
+	"strings"
 )
 
 type Command struct {
@@ -36,8 +36,8 @@ func ParseCommand(command string) Command {
 	return com
 }
 
-func (c *Command) Execute(store *Store, w io.Writer) {
-		
+func (c *Command) Execute(store *store.Store, w io.Writer) {
+
 	switch c.Operand {
 	case "set":
 		store.Set(c.Key, c.Value)
@@ -52,11 +52,9 @@ func (c *Command) Execute(store *Store, w io.Writer) {
 
 	case "delete":
 		store.Delete(c.Key)
-		fmt.Fprintln(w,"ok")
+		fmt.Fprintln(w, "ok")
 	default:
-		fmt.Fprintln(w,"Invalid Operand")
-
+		fmt.Fprintln(w, "Invalid Operand")
 
 	}
 }
-

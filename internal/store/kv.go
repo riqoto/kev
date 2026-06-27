@@ -1,4 +1,4 @@
-package main
+package store
 
 import (
 	"kev/list"
@@ -26,7 +26,6 @@ func NewStore(capacity int) *Store {
 		capacity: capacity,
 	}
 }
-
 
 func (store *Store) CleanExpiry() {
 	go func() {
@@ -79,7 +78,7 @@ func (store *Store) Set(key, value string) {
 func (store *Store) Delete(key string) string {
 	store.mu.Lock()
 	defer store.mu.Unlock()
-	if element , ok := store.Data[key]; ok {
+	if element, ok := store.Data[key]; ok {
 		deleted := element.Value.Value
 		delete(store.Data, key)
 		store.lru.Remove(element)
@@ -88,5 +87,3 @@ func (store *Store) Delete(key string) string {
 	}
 	return "key not found"
 }
-
-

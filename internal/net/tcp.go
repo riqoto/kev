@@ -1,16 +1,16 @@
-package main
+package net
 
 import (
 	"bufio"
 	"fmt"
+	"kev/internal/command"
+	"kev/internal/store"
 	"net"
 	"strings"
-//	"os"
 )
 
-
 // create TCPConfig or use default if exist for port and conn type
-func StartServer(store *Store) {
+func StartServer(store *store.Store) {
 	listener, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
@@ -29,11 +29,11 @@ func StartServer(store *Store) {
 	}
 }
 
-func handleConnection(conn net.Conn, store *Store) {
+func handleConnection(conn net.Conn, store *store.Store) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
-	
+
 	for {
 		message, err := reader.ReadString('\n')
 
@@ -42,9 +42,7 @@ func handleConnection(conn net.Conn, store *Store) {
 			return
 		}
 
-		command := ParseCommand(strings.ToLower(strings.TrimSpace(message)))
-		command.Execute(store, conn)
+		query := command.ParseCommand(strings.ToLower(strings.TrimSpace(message)))
+		query.Execute(store, conn)
 	}
 }
-
-
