@@ -40,12 +40,12 @@ func (c *Command) Execute(store *store.Store, w io.Writer) {
 
 	switch c.Operand {
 	case "set":
-		store.Set(c.Key, c.Value)
+		store.SetBytes(c.Key, []byte(c.Value))
 		fmt.Fprintln(w, "ok")
 	case "get":
-		value, ok := store.Get(c.Key)
+		value, ok := store.GetBytes(c.Key)
 		if ok {
-			fmt.Fprintln(w, value)
+			fmt.Fprintln(w, string(value))
 		} else {
 			fmt.Fprintln(w, "nil")
 		}

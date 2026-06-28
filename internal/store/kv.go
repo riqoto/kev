@@ -1,6 +1,9 @@
 package store
 
 import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
 	"kev/list"
 	"sync"
 	"time"
@@ -8,7 +11,7 @@ import (
 
 type Entry struct {
 	Key   string
-	Value string
+	Value []byte
 	TTL   time.Time
 }
 
@@ -42,25 +45,26 @@ func (store *Store) CleanExpiry() {
 		}
 	}()
 }
-func (store *Store) Get(key string) (string, bool) {
+func (store *Store) GetBytes(key string) ([]byte, bool) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	element, ok := store.Data[key]
 	if !ok {
-		return "", false
+		return nil, false
 	}
 	store.lru.MoveToFront(element)
 	return element.Value.Value, true
 }
 
-func (store *Store) Set(key, value string) {
+func (store *Store) SetBytes(key string, value []byte) bool {
 	store.mu.Lock()
+
 	defer store.mu.Unlock()
 
 	if element, ok := store.Data[key]; ok {
 		element.Value.Value = value
 		store.lru.MoveToFront(element)
-		return
+		return true
 	}
 
 	if len(store.Data) >= store.capacity {
@@ -74,7 +78,35 @@ func (store *Store) Set(key, value string) {
 	entry := Entry{Key: key, Value: value, TTL: time.Now().Add(time.Second * 60)}
 	element := store.lru.PushFront(entry)
 	store.Data[key] = element
+	return true
 }
+
+func (store *Store) Get(key string) (string, bool) {
+
+	if bytes, ok := store.GetBytes(key); ok {
+		return string(bytes), ok
+	}
+
+	return "", false
+}
+
+func (store *Store) SetNumeric(key string, value Number) bool {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, value)
+
+	if err != nil {
+		fmt.Println("failed to write numeric value: ", err)
+		return false
+	}
+
+	if ok := store.SetBytes(key, []byte(buf)); ok {
+		return ok
+	}
+
+	return false
+
+}
+
 func (store *Store) Delete(key string) string {
 	store.mu.Lock()
 	defer store.mu.Unlock()
@@ -83,7 +115,7 @@ func (store *Store) Delete(key string) string {
 		delete(store.Data, key)
 		store.lru.Remove(element)
 
-		return deleted
+		return string(deleted)
 	}
 	return "key not found"
 }
