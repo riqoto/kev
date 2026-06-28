@@ -1,33 +1,41 @@
 package main
 
 import (
-	"bufio"
+	/*"bufio"
+	  "fmt"
+	  "kev/internal/command"
+	  "kev/internal/net"
+	  "kev/internal/store"
+	  "os"
+	  "weak"
+	*/
 	"fmt"
-	"kev/internal/command"
-	"kev/internal/net"
-	"kev/internal/store"
-	"os"
+	"kev/internal/query"
 )
 
 func main() {
 
-	store := store.NewStore(1024)
-	store.CleanExpiry()
-	scanner := bufio.NewScanner(os.Stdin)
-	go net.StartServer(store)
-	for {
-		fmt.Print("> ")
-		ok := scanner.Scan()
-		if !ok {
-			scanner.Err()
-		}
-		line := scanner.Text()
+	/*	store := store.NewStore(1024)
+		store.CleanExpiry()
+		scanner := bufio.NewScanner(os.Stdin)
+		go net.StartServer(store)
+		for {
+			fmt.Print("> ")
+			ok := scanner.Scan()
+			if !ok {
+				scanner.Err()
+			}
+			line := scanner.Text()
 
-		if line == "exit" {
-			break
-		}
+			if line == "exit" {
+				break
+			}
 
-		com := command.ParseCommand(line)
-		com.Execute(store, os.Stdout)
-	}
+			com := command.ParseCommand(line)
+			com.Execute(store, os.Stdout)
+		}
+	*/
+	var uq query.UnparsedQuery = "set age 25 -ttl=60 -type=int"
+	q := uq.Parse()
+	fmt.Println(q)
 }
