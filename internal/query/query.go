@@ -35,7 +35,7 @@ func (uq UnparsedQuery) Parse() *Query {
 
 	q.Operand = ToOperand(oqv[0])
 	q.Key = oqv[1]
-	q.Value.Value = oqv[2]
+	q.Value.Value = []byte(oqv[2])
 
 	return q
 }

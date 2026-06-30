@@ -1,6 +1,7 @@
-package main
+package store
 
 import "testing"
+
 func lruKeys(s *Store) []string {
 	keys := []string{}
 
@@ -48,20 +49,20 @@ func TestLRUOrder(t *testing.T) {
 }
 func TestLRUEviction(t *testing.T) {
 
-    s := NewStore(3)
+	s := NewStore(3)
 
-    s.Set("A", "1")
-    s.Set("B", "2")
-    s.Set("C", "3")
+	s.Set("A", "1")
+	s.Set("B", "2")
+	s.Set("C", "3")
 
-    s.Get("A")
-    s.Set("D", "4")
+	s.Get("A")
+	s.Set("D", "4")
 
-    if _, ok := s.Get("B"); ok {
-        t.Fatal("B should have been evicted")
-    }
+	if _, ok := s.Get("B"); ok {
+		t.Fatal("B should have been evicted")
+	}
 
-    if _, ok := s.Get("A"); !ok {
-        t.Fatal("A should still exist")
-    }
+	if _, ok := s.Get("A"); !ok {
+		t.Fatal("A should still exist")
+	}
 }

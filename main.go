@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"kev/internal/command"
-	"kev/internal/net"
+	"kev/internal/server"
 	"kev/internal/store"
 	"os"
 	//	"weak"
@@ -17,7 +17,7 @@ func main() {
 	store := store.NewStore(1024)
 	store.CleanExpiry()
 	scanner := bufio.NewScanner(os.Stdin)
-	go net.StartServer(store)
+	go server.StartServer(store)
 	for {
 		fmt.Print("> ")
 		ok := scanner.Scan()

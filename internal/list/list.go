@@ -174,4 +174,3 @@ func (l *List[T]) PushFrontList(other *List[T]) {
         l.insertValue(e.Value, &l.root)
     }
 }
-
